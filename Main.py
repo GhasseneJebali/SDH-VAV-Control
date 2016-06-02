@@ -8,12 +8,16 @@ Created on Mon Apr 18 10:05:03 2016
 import warnings
 import src
 import time
-
+import sys
 warnings.filterwarnings("ignore")
 
 update_time_step = 900 # in secondes
 area = 296 #sf
-debug = 1
+
+if len(sys.argv)>1 and type(sys.argv[1])==int :
+    debug=sys.argv[1]
+else:
+    debug = 1
 
 DATA_LIST, KNN_model, BRR_model, Mean_Running_Average = src.setup()
 

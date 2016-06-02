@@ -127,7 +127,9 @@ def update(d, model , state, area, Mean_Running_Average, debug):
         heat = 0               
         setpt = 23
         vent = 200 
-
+        
+    setpt = round((setpt*9/5)+32,1)
+    
     write_output( vent, heat, setpt, date)   
     
     
@@ -144,9 +146,6 @@ def update(d, model , state, area, Mean_Running_Average, debug):
         bacnet_interface = eth0
         bacnet_port = 47816
         bacnet_c = bacnet.BACnetController(db, bacnet_interface, bacnet_port) 
-
-	bacnet_c.write('SDH.S4-13:HEAT.COOL', 'SDH.PXCM-11', heat)    
-        bacnet_c.write('SDH.S4-13:CTL STPT', 'SDH.PXCM-11', setpt) 
-	bacnet_c.write('SDH.S4-13:CTL FLOW MIN', 'SDH.PXCM-11', vent)       
+        bacnet_c.write('SDH.S4-13:CTL STPT', 'SDH.PXCM-11', setpt)    
                  
     return Mean_Running_Average
