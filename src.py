@@ -10,7 +10,7 @@ import xlsxwriter
 import os
 
 ###############################################################################
-def write_output( vent, heat, setpt, date):  
+def write_output( vent, heat, setpt, date, debug):  
 ###############################################################################
     import openpyxl
     
@@ -30,6 +30,9 @@ def write_output( vent, heat, setpt, date):
     
     sheet.cell(row=1, column=4).value = 'Time'
     sheet.cell(row=r+1, column=4).value = date
+    
+    sheet.cell(row=1, column=5).value = 'Debug'
+    sheet.cell(row=r+1, column=5).value = debug
     try:
         wb.save(os.path.dirname(os.path.abspath(__file__))+'\Control.xlsx') 
     except Exception: 
@@ -64,9 +67,9 @@ def setup():
     BRR_model = Prediction.Bayesian_Ridge_Regression(DATA_LIST, Prediction_horizon)
     
     
-    workbook = xlsxwriter.Workbook(os.path.dirname(os.path.abspath(__file__))+'\Control.xlsx')
-    workbook.add_worksheet()
-    workbook.close()
+#    workbook = xlsxwriter.Workbook(os.path.dirname(os.path.abspath(__file__))+'\Control.xlsx')
+#    workbook.add_worksheet()
+#    workbook.close()
     
     
     alpha = 0.7 # Higher alpha means slower adaptation
@@ -130,16 +133,16 @@ def update(d, model , state, area, Mean_Running_Average, debug):
         
     setpt = round((setpt*9/5)+32,1)
     
-    write_output( vent, heat, setpt, date)   
+    write_output( vent, heat, setpt, date, debug)   
     
     
-    if debug:
+    if debug==1:
         print heat
         print setpt
         print vent
         print '---------------------------------------'
     else:
-            
+
         from control import bacnet
             
         db = '/smap/bacnet/db/db_sdh_8062015'
@@ -147,5 +150,7 @@ def update(d, model , state, area, Mean_Running_Average, debug):
         bacnet_port = 47816
         bacnet_c = bacnet.BACnetController(db, bacnet_interface, bacnet_port) 
         bacnet_c.write('SDH.S4-13:CTL STPT', 'SDH.PXCM-11', setpt)    
-                 
+        
+    
+    
     return Mean_Running_Average

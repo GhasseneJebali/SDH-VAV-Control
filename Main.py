@@ -9,14 +9,16 @@ import warnings
 import src
 import time
 import sys
+#from smap.util import periodicSequentialCall
+
 warnings.filterwarnings("ignore")
 
 update_time_step = 900 # in secondes
 area = 296 #sf
 
-if len(sys.argv)>1 and type(sys.argv[1])==int :
+try:
     debug=sys.argv[1]
-else:
+except Exception:
     debug = 1
 
 DATA_LIST, KNN_model, BRR_model, Mean_Running_Average = src.setup()
@@ -26,4 +28,5 @@ while True:
     if ((time.time()-last_call) >= update_time_step):  
         Mean_Running_Average = src.update(DATA_LIST, BRR_model, 'start', area, Mean_Running_Average, debug)
         last_call= time.time()
-        
+
+#periodicSequentialCall(update(d, model , state, area, Mean_Running_Average, debug)).start(update_time_step)
