@@ -151,8 +151,9 @@ def update(d, model , state, area, Mean_Running_Average, debug):
         
         bacnet_c = bacnet.BACnetController(db, bacnet_interface, bacnet_port) 
         
+        bacnet_c.write('SDH.S4-13:HEAT.COOL', 'SDH.PXCM-11', heat)
         bacnet_c.write('SDH.S4-13:CTL STPT', 'SDH.PXCM-11', setpt)    
-        
+        bacnet_c.write('SDH.S4-13:CTL FLOW MIN', 'SDH.PXCM-11', vent)
     
     
     return Mean_Running_Average
