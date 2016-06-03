@@ -95,8 +95,6 @@ def update(d, model , state, area, Mean_Running_Average, debug):
     import warnings
     import time, datetime  
     
-    if debug==0:
-        from control import bacnet
     
     warnings.filterwarnings("ignore")
      
@@ -138,15 +136,10 @@ def update(d, model , state, area, Mean_Running_Average, debug):
     
     write_output( vent, heat, setpt, date, debug)   
     
-    
-    if debug==1:
-        print heat
-        print setpt
-        print vent
-        print '---------------------------------------'
         
     if debug==0:
-
+        from control import bacnet
+        
         db = '/smap/bacnet/db/db_sdh_8062015'
         bacnet_interface = 'eth0'
         bacnet_port = '47816'
@@ -156,6 +149,11 @@ def update(d, model , state, area, Mean_Running_Average, debug):
         bacnet_c.write('SDH.S4-13:HEAT.COOL', 'SDH.PXCM-11', heat)
         bacnet_c.write('SDH.S4-13:CTL STPT', 'SDH.PXCM-11', setpt)    
         bacnet_c.write('SDH.S4-13:CTL FLOW MIN', 'SDH.PXCM-11', vent)
-    
-    
+     
+    else:
+        print heat
+        print setpt
+        print vent
+        print '---------------------------------------'
+        
     return Mean_Running_Average
