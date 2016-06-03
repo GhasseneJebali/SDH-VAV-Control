@@ -146,9 +146,11 @@ def update(d, model , state, area, Mean_Running_Average, debug):
         from control import bacnet
             
         db = '/smap/bacnet/db/db_sdh_8062015'
-        bacnet_interface = eth0
-        bacnet_port = 47816
+        bacnet_interface = 'eth0'
+        bacnet_port = '47816'
+        
         bacnet_c = bacnet.BACnetController(db, bacnet_interface, bacnet_port) 
+        
         bacnet_c.write('SDH.S4-13:CTL STPT', 'SDH.PXCM-11', setpt)    
         
     
