@@ -95,6 +95,9 @@ def update(d, model , state, area, Mean_Running_Average, debug):
     import warnings
     import time, datetime  
     
+    if debug==0:
+        from control import bacnet
+    
     warnings.filterwarnings("ignore")
      
     date = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')     
@@ -141,10 +144,9 @@ def update(d, model , state, area, Mean_Running_Average, debug):
         print setpt
         print vent
         print '---------------------------------------'
-    else:
+        
+    if debug==0:
 
-        from control import bacnet
-            
         db = '/smap/bacnet/db/db_sdh_8062015'
         bacnet_interface = 'eth0'
         bacnet_port = '47816'
