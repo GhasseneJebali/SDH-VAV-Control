@@ -9,24 +9,36 @@ import warnings
 import src
 import time
 import sys
-#from smap.util import periodicSequentialCall
+from smap import driver
+from smap.util import periodicSequentialCall
 
 warnings.filterwarnings("ignore")
 
-update_time_step = 900 # in secondes
-area = 296 #sf
-
-try:
-    debug=sys.argv[1]
-except Exception:
-    debug = 1
-
-DATA_LIST, KNN_model, BRR_model, Mean_Running_Average = src.setup()
-
-last_call = 0
-while True:
-    if ((time.time()-last_call) >= update_time_step):  
-        Mean_Running_Average = src.update(DATA_LIST, BRR_model, 'start', area, Mean_Running_Average, debug)
-        last_call= time.time()
-
-#periodicSequentialCall(update(d, model , state, area, Mean_Running_Average, debug)).start(update_time_step)
+class VAV_Adaptive_control(driver.SmapDriver):
+    
+    def setup(self, opts):
+        self.rate = 10 # in secondes
+        self.area = 296 #sf
+        
+        self.debug = 1
+#    try:
+#        debug=int(sys.argv[1])
+#    except Exception:
+#        debug = 1
+        self.DATA_LIST, self.KNN_model, self.BRR_model, self.Mean_Running_Average = src.setup()
+        
+    def start(self):
+        periodicSequentialCall(self.update).start(self.rate)
+    
+    
+    def update(self):
+        
+        self.Mean_Running_Average = src.update(self.DATA_LIST, self.BRR_model, 'start', self.area, self.Mean_Running_Average, self.debug)
+    
+    
+#    last_call = 0
+#    while True:
+#        if ((time.time()-last_call) >= update_time_step):  
+#            Mean_Running_Average = src.update(DATA_LIST, BRR_model, 'start', area, Mean_Running_Average, debug)
+#            last_call= time.time()
+    

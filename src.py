@@ -135,9 +135,13 @@ def update(d, model , state, area, Mean_Running_Average, debug):
     setpt = round((setpt*9/5)+32,1)
     
     write_output( vent, heat, setpt, date, debug)   
-    
-        
-    if debug==0:
+
+    if (debug == 0):
+        command = True
+    if (debug == 1):
+        command = False
+
+    if command:
         from control import bacnet
         
         db = '/smap/bacnet/db/db_sdh_8062015'
@@ -150,7 +154,7 @@ def update(d, model , state, area, Mean_Running_Average, debug):
         bacnet_c.write('SDH.S4-13:CTL STPT', 'SDH.PXCM-11', setpt)    
         bacnet_c.write('SDH.S4-13:CTL FLOW MIN', 'SDH.PXCM-11', vent)
      
-    else:
+    if not command:
         print heat
         print setpt
         print vent

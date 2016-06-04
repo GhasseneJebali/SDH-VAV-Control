@@ -87,13 +87,13 @@ def control(state, N_person, area, T_outdoor, co2, T_predicted, Mean_Running_Ave
     Vent_min = (CA*area + CP*N_person) / Zone_Air_Distribution_Effectiveness
     Vent_setpt = 2*Vent_min
 
-
     # morning afternnon determination
     hour = time.strftime("%H")
     if hour < 12:
         AM_PM = 'AM'
     else:
         AM_PM = 'PM'        
+         
          
     if state == 'not occupied':
         if Mean_Running_Average > 15 :
