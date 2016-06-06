@@ -12,7 +12,7 @@ import os
 ###############################################################################
 def write_output( vent, heat, setpt, date, debug):  
 ###############################################################################
-    import openpyxl
+
     
     wb = openpyxl.load_workbook(os.path.dirname(os.path.abspath(__file__))+'\Control.xlsx')
     sheet = wb.get_sheet_by_name('Sheet1')
