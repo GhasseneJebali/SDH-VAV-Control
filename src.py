@@ -34,7 +34,7 @@ def write_output( vent, heat, setpt, date, debug):
     sheet.cell(row=1, column=5).value = 'Debug'
     sheet.cell(row=r+1, column=5).value = debug
     try:
-        wb.save(os.path.dirname('Control.xlsx') 
+        wb.save('Control.xlsx') 
     except Exception: 
         pass
 
