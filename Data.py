@@ -311,7 +311,7 @@ def data_acquisition():
     
     print 'Write start..'
     # Create a path and a file to save the data
-    workbook = xlsxwriter.Workbook(os.path.dirname(os.path.abspath(__file__))+'\DATA_LIST.xlsx')
+    workbook = xlsxwriter.Workbook('DATA_LIST.xlsx')
     worksheet = workbook.add_worksheet()
     col=0
     for keys in DATA_LIST.keys():    
