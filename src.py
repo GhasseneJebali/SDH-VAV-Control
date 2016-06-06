@@ -123,14 +123,14 @@ def update(d, model , state, area, Mean_Running_Average, debug):
     except Exception:
         print 'WARNING : PROBLEM DETECTED 3'
         T_predicted= T
-        
-    try:
-          vent, heat, setpt, Mean_Running_Average = Control.control(state, number/6, area, T_outdoor, co2, T_predicted, Mean_Running_Average )
-    except Exception:
-        print 'WARNING : PROBLEM DETECTED 4'
-        heat = 0               
-        setpt = 23
-        vent = 200 
+    vent, heat, setpt, Mean_Running_Average = Control.control(state, number/6, area, T_outdoor, co2, T_predicted, Mean_Running_Average )    
+    #try:
+    #      vent, heat, setpt, Mean_Running_Average = Control.control(state, number/6, area, T_outdoor, co2, T_predicted, Mean_Running_Average )
+    #except Exception:
+    #    print 'WARNING : PROBLEM DETECTED 4'
+     #   heat = 0               
+      #  setpt = 23
+       # vent = 200 
         
     setpt = round((setpt*9/5)+32,1)
     
