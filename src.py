@@ -14,7 +14,7 @@ def write_output( vent, heat, setpt, date, debug):
 ###############################################################################
     import openpyxl
     
-    wb = openpyxl.load_workbook(os.path.dirname(os.path.abspath(__file__))+'\Control.xlsx')
+    wb = openpyxl.load_workbook('Control.xlsx')
     sheet = wb.get_sheet_by_name('Sheet1')
     r = sheet.max_row
 
@@ -34,7 +34,7 @@ def write_output( vent, heat, setpt, date, debug):
     sheet.cell(row=1, column=5).value = 'Debug'
     sheet.cell(row=r+1, column=5).value = debug
     try:
-        wb.save(os.path.dirname(os.path.abspath(__file__))+'\Control.xlsx') 
+        wb.save(os.path.dirname('Control.xlsx') 
     except Exception: 
         pass
 
@@ -53,7 +53,7 @@ def setup():
 
     #Data.data_acquisition()
     DATA_LIST={}
-    wb = openpyxl.load_workbook(os.path.dirname(os.path.abspath(__file__))+'\DATA_LIST.xlsx')
+    wb = openpyxl.load_workbook('DATA_LIST.xlsx')
     sheet = wb.get_sheet_by_name('Sheet1')
     for key in range(1, sheet.max_column+1):
         DATA_LIST[sheet.cell(row=1, column=key).value]=[]
