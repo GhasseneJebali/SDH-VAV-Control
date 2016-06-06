@@ -19,7 +19,8 @@ class VAV_Adaptive_control(driver.SmapDriver):
     def setup(self, opts):
         self.rate = 900 # in secondes
         self.area = 296 #sf
-        
+        self.add_timeseries("/error", "binary", data_type='double')
+        self.error = False
         self.debug = 1
 #    try:
 #        debug=int(sys.argv[1])
@@ -32,13 +33,10 @@ class VAV_Adaptive_control(driver.SmapDriver):
     
     
     def update(self):
-        
-        self.Mean_Running_Average = src.update(self.DATA_LIST, self.BRR_model, 'start', self.area, self.Mean_Running_Average, self.debug)
-    
-    
-#    last_call = 0
-#    while True:
-#        if ((time.time()-last_call) >= update_time_step):  
-#            Mean_Running_Average = src.update(DATA_LIST, BRR_model, 'start', area, Mean_Running_Average, debug)
-#            last_call= time.time()
-    
+        try:
+            self.Mean_Running_Average = src.update(self.DATA_LIST, self.BRR_model, 'start', self.area, self.Mean_Running_Average, self.debug)
+            self.error = False
+        except Exception:
+            self.error = True
+        self.add("/error",time.time(), float(self.error))
+            #bacnet_c.write('SDH.S4-13:HEAT.COOL', 'SDH.PXCM-11', None, clear=True)    

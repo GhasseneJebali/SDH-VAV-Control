@@ -9,7 +9,6 @@ from smap.contrib import dtutil
 from scipy.interpolate import interp1d
 import os
 import xlsxwriter
-import calendar
 import datetime
 import time
 
@@ -275,7 +274,7 @@ def data_acquisition():
         month = int (date[5:7])
         day = int (date[8:10])
         hour = int(date[11:13])
-        day_number=calendar.weekday(year, month, day)
+        day_number=datetime.date(year, month, day).weekday()
         if month==1 or month==2 or month==12:
             Season.append(1)
         if month==6 or month==7 or month==8 or month==9:
@@ -376,7 +375,7 @@ def Real_Time_Data():
     month = int (date[5:7])
     day = int (date[8:10])
     hour = int(date[11:13])
-    day_number=calendar.weekday(year, month, day)
+    day_number=datetime.date(year, month, day).weekday()
     if month==1 or month==2 or month==12:
         Season=1
     if month==6 or month==7 or month==8 or month==9:

@@ -53,8 +53,8 @@ def ACZ(previous_Mean_Running_Average):
     else:
         Mean_Running_Average = previous_Mean_Running_Average
     
-    Upper_limit = 0.31 * Mean_Running_Average + 20.3
-    Lower_limit = 0.31 * Mean_Running_Average + 15.3
+    Upper_limit = 0.31 * Mean_Running_Average + 21.3
+    Lower_limit = 0.31 * Mean_Running_Average + 14.3
     
     return Lower_limit, Upper_limit, Mean_Running_Average
     
@@ -94,7 +94,7 @@ def control(state, N_person, area, T_outdoor, co2, T_predicted, Mean_Running_Ave
     else:
         AM_PM = 'PM'        
          
-         
+
     if state == 'not occupied':
         if Mean_Running_Average > 15 :
            

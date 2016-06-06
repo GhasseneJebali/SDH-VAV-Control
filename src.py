@@ -12,7 +12,7 @@ import os
 ###############################################################################
 def write_output( vent, heat, setpt, date, debug):  
 ###############################################################################
-
+    import openpyxl
     
     wb = openpyxl.load_workbook(os.path.dirname(os.path.abspath(__file__))+'\Control.xlsx')
     sheet = wb.get_sheet_by_name('Sheet1')
@@ -153,7 +153,8 @@ def update(d, model , state, area, Mean_Running_Average, debug):
         bacnet_c.write('SDH.S4-13:HEAT.COOL', 'SDH.PXCM-11', heat)
         bacnet_c.write('SDH.S4-13:CTL STPT', 'SDH.PXCM-11', setpt)    
         bacnet_c.write('SDH.S4-13:CTL FLOW MIN', 'SDH.PXCM-11', vent)
-     
+        
+        
     if not command:
         print heat
         print setpt

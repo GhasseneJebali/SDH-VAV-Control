@@ -8,7 +8,7 @@ Created on Fri Apr 15 10:06:19 2016
 from sklearn.svm import SVR
 from sklearn import neighbors
 from sklearn import linear_model
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 
 
