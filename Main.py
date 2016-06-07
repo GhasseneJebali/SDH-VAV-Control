@@ -17,7 +17,7 @@ warnings.filterwarnings("ignore")
 class VAV_Adaptive_control(driver.SmapDriver):
     
     def setup(self, opts):
-        self.rate = 900 # in secondes
+        self.rate = 60 # in secondes
         self.area = 296 #sf
         self.add_timeseries("/error", "binary", data_type='double')
         self.error = False
