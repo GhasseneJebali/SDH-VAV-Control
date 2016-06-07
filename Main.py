@@ -22,6 +22,7 @@ class VAV_Adaptive_control(driver.SmapDriver):
         self.add_timeseries("/error", "binary", data_type='double')
         self.error = False
         self.debug = 1
+        self.state = 'start'
 #    try:
 #        debug=int(sys.argv[1])
 #    except Exception:
@@ -34,9 +35,11 @@ class VAV_Adaptive_control(driver.SmapDriver):
     
     def update(self):
         try:
-            self.Mean_Running_Average = src.update(self.DATA_LIST, self.BRR_model, 'start', self.area, self.Mean_Running_Average, self.debug)
+            self.Mean_Running_Average, self.state = src.update(self.DATA_LIST, self.BRR_model, self.state, self.area, self.Mean_Running_Average, self.debug)
             self.error = False
-        except Exception:
+        except Exception, e:
             self.error = True
+            print e
+            
         self.add("/error",time.time(), float(self.error))
             #bacnet_c.write('SDH.S4-13:HEAT.COOL', 'SDH.PXCM-11', None, clear=True)    

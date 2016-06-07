@@ -63,12 +63,13 @@ def control(state, N_person, area, T_outdoor, co2, T_predicted, Mean_Running_Ave
     import time
     import requests
        
-    
+    print 'forecast download start'
     forecast = requests.get("http://api.wunderground.com/api/0d2ebd8eea932783/forecast/q/CA/berkeley.json").json()
     next_day = forecast['forecast']['simpleforecast']['forecastday'][0]
     
     T_forecast_max = next_day['high']['celsius'] 
-    
+    print 'forecast download ok'    
+    print 'ACZ start'
     # temperature setpoints
     Lower_T_limit, Upper_T_limit, Mean_Running_Average  = ACZ(Mean_Running_Average)
     
@@ -79,7 +80,7 @@ def control(state, N_person, area, T_outdoor, co2, T_predicted, Mean_Running_Ave
     Center_setpt=round(Center_setpt,1)
     Low_setpt=round(Low_setpt,1)
     
-    
+    print 'ACZ ok'
     # ventillation setpoint
     CA = 0.06 # cfm/ft2
     CP = 5 # cfm/person
