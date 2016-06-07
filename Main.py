@@ -20,6 +20,10 @@ class VAV_Adaptive_control(driver.SmapDriver):
         self.rate = 60 # in secondes
         self.area = 296 #sf
         self.add_timeseries("/error", "binary", data_type='double')
+        self.add_timeseries("/Heat_Cool", "binary", data_type='double')
+        self.add_timeseries("/Minimum_ventillation", "cfm", data_type='double')
+        self.add_timeseries("/T_Setpoint", "F", data_type='double')
+        self.add_timeseries("/Weighted_Running_Average", "C", data_type='double')
         self.error = False
         self.debug = 1
         self.state = 'start'
@@ -35,11 +39,15 @@ class VAV_Adaptive_control(driver.SmapDriver):
     
     def update(self):
         try:
-            self.Mean_Running_Average, self.state = src.update(self.DATA_LIST, self.BRR_model, self.state, self.area, self.Mean_Running_Average, self.debug)
+            self.Mean_Running_Average, self.state, self.vent, self.heat, self.setpt = src.update(self.DATA_LIST, self.BRR_model, self.state, self.area, self.Mean_Running_Average, self.debug)
             self.error = False
         except Exception, e:
             self.error = True
             print e
             
         self.add("/error",time.time(), float(self.error))
+        self.add("/Heat_Cool",time.time(), float(self.heat))
+        self.add("/Minimum_ventillation",time.time(), float(self.vent))
+        self.add("/T_Setpoint",time.time(), float(self.setpt))
+        self.add("/Weighted_Running_Average",time.time(), float(self.Mean_Running_Average))
             #bacnet_c.write('SDH.S4-13:HEAT.COOL', 'SDH.PXCM-11', None, clear=True)    

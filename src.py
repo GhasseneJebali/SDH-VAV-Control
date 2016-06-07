@@ -165,4 +165,4 @@ def update(d, model , state, area, Mean_Running_Average, debug):
         print vent
         print '---------------------------------------'
         
-    return Mean_Running_Average, state
+    return Mean_Running_Average, state, vent, heat, setpt
