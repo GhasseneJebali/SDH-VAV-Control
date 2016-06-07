@@ -150,7 +150,7 @@ def update(d, model , state, area, Mean_Running_Average, debug):
     if (debug == 1):
         command = False
 
-    if command:
+    if (command and warning < 4):
         from control import bacnet
         
         db = '/smap/bacnet/db/db_sdh_8062015'
