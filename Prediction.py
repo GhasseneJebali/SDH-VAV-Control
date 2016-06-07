@@ -21,15 +21,15 @@ def Data_Validation(data, X):
     for k in data.keys():
         upper[k]=max(data[k])
         lower[k]=min(data[k])
-    if (X[0]<lower['Temperature']*0.9) or (X[0]>upper['Temperature']*1.1):
+    if (X[0]<lower['Temperature']*0.75) or (X[0]>upper['Temperature']*1.25):
         valid=0
-    if (X[1]<lower['H/C power']*0.9) or (X[1]>upper['H/C power']*1.1):
+    if (X[1]<lower['H/C power']*0.75) or (X[1]>upper['H/C power']*1.25):
         valid=0
-    if (X[2]<lower['Setpoint Temperature']*0.9) or (X[2]>upper['Setpoint Temperature']*1.1):
+    if (X[2]<lower['Setpoint Temperature']*0.75) or (X[2]>upper['Setpoint Temperature']*1.25):
         valid=0
-    if (X[3]<lower['Outdoor Temperature']*0.9) or (X[3]>upper['Outdoor Temperature']*1.1):
+    if (X[3]<lower['Outdoor Temperature']*0.75) or (X[3]>upper['Outdoor Temperature']*1.25):
         valid=0
-    if (X[4]<lower['Calendar data']*0.9) or (X[4]>upper['Calendar data']*1.1):
+    if (X[4]<lower['Calendar data']*0.75) or (X[4]>upper['Calendar data']*1.25):
         valid=0
     return valid
 

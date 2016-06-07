@@ -99,13 +99,15 @@ def update(d, model , state, area, Mean_Running_Average, debug):
     warnings.filterwarnings("ignore")
      
     date = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')     
-     
+    warning = 0
+    
     # Real time data
     try:    
         [T, co2, set_point, hum, T_outdoor, Human_date, Season, Cal_data, vent_power, H_C_power, cool_power, hour]=Data.Real_Time_Data()
     except Exception, e:
         print 'WARNING : PROBLEM DETECTED 1'
         print e
+        warning = 1
         [T, co2, set_point, T_outdoor,   Cal_data,  H_C_power,  hour] = [23,400,23,23,2,-12,12]
         
     #occupancy prdiction
@@ -114,6 +116,7 @@ def update(d, model , state, area, Mean_Running_Average, debug):
     except Exception, e:
         print 'WARNING : PROBLEM DETECTED 2'
         print e
+        warning = 2
         state='occupied'
         Human_power=3.0
         number=30
@@ -125,6 +128,7 @@ def update(d, model , state, area, Mean_Running_Average, debug):
     except Exception, e:
         print 'WARNING : PROBLEM DETECTED 3'
         print e
+        warning = 3
         T_predicted= T
     try:
           vent, heat, setpt, Mean_Running_Average = Control.control(state, number/6, area, T_outdoor, co2, T_predicted, Mean_Running_Average )
@@ -132,6 +136,7 @@ def update(d, model , state, area, Mean_Running_Average, debug):
         print Exception
         print 'WARNING : PROBLEM DETECTED 4'
         print e
+        warning = 4
         heat = 0               
         setpt = 23
         vent = 200 
@@ -158,11 +163,10 @@ def update(d, model , state, area, Mean_Running_Average, debug):
         bacnet_c.write('SDH.S4-13:CTL STPT', 'SDH.PXCM-11', setpt)    
         bacnet_c.write('SDH.S4-13:CTL FLOW MIN', 'SDH.PXCM-11', vent)
         
+    
+    print heat
+    print setpt
+    print vent
+    print '---------------------------------------'
         
-    if not command:
-        print heat
-        print setpt
-        print vent
-        print '---------------------------------------'
-        
-    return Mean_Running_Average, state, vent, heat, setpt
+    return Mean_Running_Average, state, vent, heat, setpt, warning
