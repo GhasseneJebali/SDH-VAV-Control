@@ -54,7 +54,7 @@ def ACZ(previous_Mean_Running_Average):
         Mean_Running_Average = previous_Mean_Running_Average
     
     Upper_limit = 0.31 * Mean_Running_Average + 21.3
-    Lower_limit = 0.31 * Mean_Running_Average + 14.3
+    Lower_limit = 0.31 * Mean_Running_Average + 14.3 - 1 #Larger confort zone to avoid unnecessary cooling 
     
     return Lower_limit, Upper_limit, Mean_Running_Average
     
@@ -83,7 +83,7 @@ def control(state, N_person, area, T_outdoor, co2, T_predicted, Mean_Running_Ave
     CP = 5 # cfm/person
     Zone_Air_Distribution_Effectiveness = 1.0
     Vent_min = (CA*area + CP*N_person) / Zone_Air_Distribution_Effectiveness
-    Vent_setpt = 2*Vent_min
+    Vent_setpt = 5*Vent_min #greater ventillation minimum to avoid overheating of the zone.
 
     # morning afternnon determination
     hour = time.strftime("%H")
@@ -96,13 +96,13 @@ def control(state, N_person, area, T_outdoor, co2, T_predicted, Mean_Running_Ave
     if state == 'not occupied':
         if Mean_Running_Average > 15 :
            
-            vent = Vent_setpt*2
+            vent = Vent_setpt
             heat = 0
             setpt = Upper_T_limit
             return   vent, heat, setpt, Mean_Running_Average
         else:
            
-            vent = Vent_setpt*2
+            vent = Vent_setpt
             heat = 1
             setpt = Lower_T_limit
             return    vent, heat, setpt, Mean_Running_Average
@@ -110,20 +110,20 @@ def control(state, N_person, area, T_outdoor, co2, T_predicted, Mean_Running_Ave
     if state == 'occupied':
         if co2 > 800:
       
-            vent = Vent_setpt*4
+            vent = Vent_setpt*1.5
             heat = 0
             setpt = Center_setpt
             return   vent, heat, setpt, Mean_Running_Average
         if co2 <= 800:
             if T_predicted > Upper_T_limit:
               
-                vent = Vent_setpt*4
+                vent = Vent_setpt*1.5
                 heat = 0
                 setpt = Center_setpt
                 return  vent, heat, setpt, Mean_Running_Average
             if T_predicted < Lower_T_limit:
               
-                vent = Vent_setpt*3
+                vent = Vent_setpt
                 heat = 1
                 setpt = Low_setpt
                 return  vent, heat, setpt, Mean_Running_Average
@@ -131,26 +131,26 @@ def control(state, N_person, area, T_outdoor, co2, T_predicted, Mean_Running_Ave
                 if Mean_Running_Average <= 15:
                     if AM_PM == 'AM':
                       
-                        vent = Vent_setpt*3
+                        vent = Vent_setpt
                         heat = 1
                         setpt = Low_setpt
                         return   vent, heat, setpt, Mean_Running_Average
                     if AM_PM == 'PM':
                       
-                        vent = Vent_setpt*3
+                        vent = Vent_setpt
                         heat = 1
                         setpt = Center_setpt
                         return   vent, heat, setpt, Mean_Running_Average
                 if Mean_Running_Average > 15:
                     if AM_PM == 'AM':
                        
-                        vent = Vent_setpt*3
+                        vent = Vent_setpt
                         heat = 0
                         setpt = Low_setpt
                         return   vent, heat, setpt, Mean_Running_Average
                     if AM_PM == 'PM':
                       
-                        vent = Vent_setpt*3
+                        vent = Vent_setpt
                         heat = 0
                         setpt = Center_setpt
                         return   vent, heat, setpt , Mean_Running_Average    
@@ -161,43 +161,43 @@ def control(state, N_person, area, T_outdoor, co2, T_predicted, Mean_Running_Ave
             if Mean_Running_Average > 15:
                 if T_predicted > Upper_T_limit:
           
-                    vent = Vent_setpt*3
+                    vent = Vent_setpt*1.5
                     heat = 0
                     setpt = Center_setpt
                     return  vent, heat, setpt, Mean_Running_Average
                 if T_predicted < Lower_T_limit:
                 
-                    vent = Vent_setpt*2
+                    vent = Vent_setpt
                     heat = 0
                     setpt = Low_setpt
                     return  vent, heat, setpt, Mean_Running_Average
                 else:
                  
-                    vent = Vent_setpt*2
+                    vent = Vent_setpt
                     heat = 0
                     setpt = Center_setpt
                     return  vent, heat, setpt, Mean_Running_Average
             if Mean_Running_Average <= 15:
                 if T_predicted > Upper_T_limit:
                
-                    vent = Vent_setpt*3
+                    vent = Vent_setpt
                     heat = 0
                     setpt = Center_setpt
                     return  vent, heat, setpt, Mean_Running_Average
                 if T_predicted < Lower_T_limit:
 
-                    vent = Vent_setpt*2
+                    vent = Vent_setpt
                     heat = 1
                     setpt = Low_setpt
                     return   vent, heat, setpt, Mean_Running_Average
                 else:
 
-                    vent = Vent_setpt*2
+                    vent = Vent_setpt
                     heat = 1
                     setpt = Center_setpt
                     return  vent, heat, setpt, Mean_Running_Average
         else:
-            vent = Vent_setpt*3
+            vent = Vent_setpt*1.5
             heat = 0
             setpt = Center_setpt
             return   vent, heat, setpt, Mean_Running_Average
