@@ -98,7 +98,7 @@ def control(state, N_person, area, T_outdoor, co2, T_predicted, Mean_Running_Ave
            
             vent = Vent_setpt*2
             heat = 0
-            setpt = Lower_T_limit
+            setpt = Upper_T_limit
             return   vent, heat, setpt, Mean_Running_Average
         else:
            
