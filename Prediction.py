@@ -174,12 +174,14 @@ def Bayesian_Ridge_Regression(data, Prediction_horizon):
 ###############################################################################
 def T_prediciton(data, X , model):    
 ###############################################################################  
+    warning=0
     if Data_Validation(data, X):
         T = model.predict(X)[0]
     else:
         T = X[0]
+        warning=1
         print 'Input data is invalid or may be outside boundaries'
-    return T
+    return T, warning
 ###############################################################################
 
 

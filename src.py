@@ -107,7 +107,7 @@ def update(d, model , state, area, Mean_Running_Average, debug):
     except Exception, e:
         print 'WARNING : PROBLEM DETECTED 1'
         print e
-        warning = 1
+        warning = 3
         [T, co2, set_point, T_outdoor,   Cal_data,  H_C_power,  hour] = [23,400,23,23,2,-12,12]
         
     #occupancy prdiction
@@ -124,11 +124,11 @@ def update(d, model , state, area, Mean_Running_Average, debug):
     # Temperature prediction   
     T_needed_data=[T , H_C_power,  set_point, T_outdoor, Cal_data, Human_power]
     try: 
-        T_predicted= Prediction.T_prediciton(d, T_needed_data , model)
+        T_predicted, warning= Prediction.T_prediciton(d, T_needed_data , model)
     except Exception, e:
         print 'WARNING : PROBLEM DETECTED 3'
         print e
-        warning = 3
+        warning = 2
         T_predicted= T
     try:
           vent, heat, setpt, Mean_Running_Average = Control.control(state, number/6, area, T_outdoor, co2, T_predicted, Mean_Running_Average )
