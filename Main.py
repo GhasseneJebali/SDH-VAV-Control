@@ -57,11 +57,14 @@ class VAV_Adaptive_control(driver.SmapDriver):
             bacnet_c.write('SDH.S4-13:CTL STPT', 'SDH.PXCM-11', None, clear=True)
             bacnet_c.write('SDH.S4-13:CTL FLOW MIN', 'SDH.PXCM-11', None, clear=True)
             
-            
-        self.add("/error",time.time(), float(self.error))
-        self.add("/Warning",time.time(), float(self.warning))
-        self.add("/Heat_Cool",time.time(), float(self.heat))
-        self.add("/Minimum_ventillation",time.time(), float(self.vent))
-        self.add("/T_Setpoint",time.time(), float(self.setpt))
-        self.add("/Weighted_Running_Average",time.time(), float(self.Mean_Running_Average))
-            #bacnet_c.write('SDH.S4-13:HEAT.COOL', 'SDH.PXCM-11', None, clear=True)    
+        try:  
+            self.add("/error",time.time(), float(self.error))
+            self.add("/Warning",time.time(), float(self.warning))
+            self.add("/Heat_Cool",time.time(), float(self.heat))
+            self.add("/Minimum_ventillation",time.time(), float(self.vent))
+            self.add("/T_Setpoint",time.time(), float(self.setpt))
+            self.add("/Weighted_Running_Average",time.time(), float(self.Mean_Running_Average))
+                #bacnet_c.write('SDH.S4-13:HEAT.COOL', 'SDH.PXCM-11', None, clear=True)  
+        except Exception:
+            pass
+        
