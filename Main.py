@@ -11,6 +11,7 @@ import time
 import sys
 from smap import driver
 from smap.util import periodicSequentialCall
+from control import bacnet
 
 warnings.filterwarnings("ignore")
 
@@ -33,38 +34,51 @@ class VAV_Adaptive_control(driver.SmapDriver):
 #        debug=int(sys.argv[1])
 #    except Exception:
 #        debug = 1
+        
+        db = '/smap/bacnet/db/db_sdh_8062015'
+        bacnet_interface = 'eth0'
+        bacnet_port = '47816'
+                
+        self.bacnet_c = bacnet.BACnetController(db, bacnet_interface, bacnet_port) 
+        
         self.DATA_LIST, self.KNN_model, self.BRR_model, self.Mean_Running_Average = src.setup()
         
     def start(self):
-        periodicSequentialCall(self.update).start(self.rate)
+        periodicSequentialCall(self.read).start(self.rate)
     
     
-    def update(self):
+    def read(self):
         try:
             self.Mean_Running_Average, self.state, self.vent, self.heat, self.setpt, self.warning = src.update(self.DATA_LIST, self.BRR_model, self.state, self.area, self.Mean_Running_Average, self.debug)
             self.error = False
+            
+            if (self.debug == 0):
+                command = True
+            if (self.debug == 1):
+                command = False
+        
+            if (command and self.warning < 4):
+
+                self.bacnet_c.write('SDH.S4-13:HEAT.COOL', 'SDH.PXCM-11', self.heat)
+                self.bacnet_c.write('SDH.S4-13:CTL STPT', 'SDH.PXCM-11', self.setpt)    
+                self.bacnet_c.write('SDH.S4-13:CTL FLOW MIN', 'SDH.PXCM-11', self.vent)
+                
+        
         except Exception, e:
             self.error = True
             print e
-            from control import bacnet
-        
-            db = '/smap/bacnet/db/db_sdh_8062015'
-            bacnet_interface = 'eth0'
-            bacnet_port = '47816'
             
-            bacnet_c = bacnet.BACnetController(db, bacnet_interface, bacnet_port) 
-            bacnet_c.write('SDH.S4-13:HEAT.COOL', 'SDH.PXCM-11', None, clear=True)
-            bacnet_c.write('SDH.S4-13:CTL STPT', 'SDH.PXCM-11', None, clear=True)
-            bacnet_c.write('SDH.S4-13:CTL FLOW MIN', 'SDH.PXCM-11', None, clear=True)
+            self.bacnet_c.write('SDH.S4-13:HEAT.COOL', 'SDH.PXCM-11', None, clear=True)
+            self.bacnet_c.write('SDH.S4-13:CTL STPT', 'SDH.PXCM-11', None, clear=True)
+            self.bacnet_c.write('SDH.S4-13:CTL FLOW MIN', 'SDH.PXCM-11', None, clear=True)
             
-        try:  
-            self.add("/error",time.time(), float(self.error))
-            self.add("/Warning",time.time(), float(self.warning))
-            self.add("/Heat_Cool",time.time(), float(self.heat))
-            self.add("/Minimum_ventillation",time.time(), float(self.vent))
-            self.add("/T_Setpoint",time.time(), float(self.setpt))
-            self.add("/Weighted_Running_Average",time.time(), float(self.Mean_Running_Average))
-                #bacnet_c.write('SDH.S4-13:HEAT.COOL', 'SDH.PXCM-11', None, clear=True)  
-        except Exception:
-            pass
-        
+#        try:  
+#            self.add("/error",time.time(), float(self.error))
+#            self.add("/Warning",time.time(), float(self.warning))
+#            self.add("/Heat_Cool",time.time(), float(self.heat))
+#            self.add("/Minimum_ventillation",time.time(), float(self.vent))
+#            self.add("/T_Setpoint",time.time(), float(self.setpt))
+#            self.add("/Weighted_Running_Average",time.time(), float(self.Mean_Running_Average))
+#                #bacnet_c.write('SDH.S4-13:HEAT.COOL', 'SDH.PXCM-11', None, clear=True)  
+#        except Exception:
+#            pass     
