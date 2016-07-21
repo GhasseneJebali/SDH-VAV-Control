@@ -67,10 +67,10 @@ class VAV_Adaptive_control(driver.SmapDriver):
         except Exception, e:
             self.error = True
             print e
-            
-            self.bacnet_c.write('SDH.S4-13:HEAT.COOL', 'SDH.PXCM-11', None, clear=True)
-            self.bacnet_c.write('SDH.S4-13:CTL STPT', 'SDH.PXCM-11', None, clear=True)
-            self.bacnet_c.write('SDH.S4-13:CTL FLOW MIN', 'SDH.PXCM-11', None, clear=True)
+            pass
+            #self.bacnet_c.write('SDH.S4-13:HEAT.COOL', 'SDH.PXCM-11', None, clear=True)
+            #self.bacnet_c.write('SDH.S4-13:CTL STPT', 'SDH.PXCM-11', None, clear=True)
+            #self.bacnet_c.write('SDH.S4-13:CTL FLOW MIN', 'SDH.PXCM-11', None, clear=True)
             
 #        try:  
 #            self.add("/error",time.time(), float(self.error))
