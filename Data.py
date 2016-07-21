@@ -340,9 +340,9 @@ def data_acquisition():
     
 
 ###############################################################################
-def Real_Time_Data():
+def Real_Time_Data(client):
 ###############################################################################  
-    client = SmapClient("http://www.openbms.org/backend")
+    #client = SmapClient("http://www.openbms.org/backend")
     
     # Temperature
     T_data1 = client.latest("uuid = '"+ T_uuid1+"'")[0]['Readings'][0][1]
