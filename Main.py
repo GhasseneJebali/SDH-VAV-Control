@@ -5,6 +5,8 @@ Created on Mon Apr 18 10:05:03 2016
 @author: Ghassene Jebali jbali.ghassen@gmail.com
 """
 
+from smap.archiver.client import SmapClient
+from smap.contrib import dtutil
 import warnings
 import src
 import time
@@ -40,7 +42,7 @@ class VAV_Adaptive_control(driver.SmapDriver):
         bacnet_port = '47816'
                 
         self.bacnet_c = bacnet.BACnetController(db, bacnet_interface, bacnet_port) 
-        
+        self.client = SmapClient("http://www.openbms.org/backend")
         self.DATA_LIST, self.KNN_model, self.BRR_model, self.Mean_Running_Average = src.setup()
         
     def start(self):
@@ -49,7 +51,7 @@ class VAV_Adaptive_control(driver.SmapDriver):
     
     def read(self):
         try:
-            self.Mean_Running_Average, self.state, self.vent, self.heat, self.setpt, self.warning = src.update(self.DATA_LIST, self.BRR_model, self.state, self.area, self.Mean_Running_Average, self.debug)
+            self.Mean_Running_Average, self.state, self.vent, self.heat, self.setpt, self.warning = src.update(self.DATA_LIST, self.BRR_model, self.client, self.state, self.area, self.Mean_Running_Average, self.debug)
             self.error = False
             
             if (self.debug == 0):
