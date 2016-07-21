@@ -87,7 +87,7 @@ def setup():
     
     
 ###############################################################################    
-def update(d, model , state, area, Mean_Running_Average, debug):  
+def update(d, model, client, state, area, Mean_Running_Average, debug):  
 ###############################################################################
     import Data
     import Prediction
@@ -103,7 +103,7 @@ def update(d, model , state, area, Mean_Running_Average, debug):
     
     # Real time data
     try:    
-        [T, co2, set_point, hum, T_outdoor, Human_date, Season, Cal_data, vent_power, H_C_power, cool_power, hour]=Data.Real_Time_Data()
+        [T, co2, set_point, hum, T_outdoor, Human_date, Season, Cal_data, vent_power, H_C_power, cool_power, hour]=Data.Real_Time_Data(client)
     except Exception, e:
         print 'WARNING : PROBLEM DETECTED 1'
         print e
