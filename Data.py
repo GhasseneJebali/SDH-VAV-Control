@@ -350,9 +350,16 @@ def Real_Time_Data(client):
     T=(((T_data1+T_data2)/2)-32)*5/9
     
     # Co2 data
+    co2_uuid5 = 'b706f40c-b7f1-568f-b676-be02200ba0cd' # VAV zone 21 / RPI 17
+    co2_uuid6 = 'bd515b13-d391-5fb6-a272-c82504d7680a' # VAV zone 2 / RPI 16
+    co2_uuid7 = '630d4fc1-6a64-5c54-a0c7-f502d7777abd' # VAV zone 13 / RPI 13
+
     co2_data1 = client.latest("uuid = '"+ co2_uuid5+"'")[0]['Readings'][0][1]
     co2_data2 = client.latest("uuid = '"+ co2_uuid6+"'")[0]['Readings'][0][1]
-    co2=(co2_data1+co2_data2)/2
+    co2_data3 = client.latest("uuid = '"+ co2_uuid7+"'")[0]['Readings'][0][1]
+    
+    co2=(co2_data1 + co2_data2 + co2_data3 )/3
+
     
     # Set ponit 
     S=0
