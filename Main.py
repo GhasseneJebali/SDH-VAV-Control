@@ -60,11 +60,30 @@ class VAV_Adaptive_control(driver.SmapDriver):
                 command = False
         
             if (command and self.warning < 4):
-
+                
+                self.bacnet_c.write('SDH.S4-02:HEAT.COOL', 'SDH.PXCM-11', self.heat)
+                self.bacnet_c.write('SDH.S4-02:CTL STPT', 'SDH.PXCM-11', self.setpt)    
+                self.bacnet_c.write('SDH.S4-02:CTL FLOW MIN', 'SDH.PXCM-11', self.vent)
+                
+                self.bacnet_c.write('SDH.S4-04:HEAT.COOL', 'SDH.PXCM-11', self.heat)
+                self.bacnet_c.write('SDH.S4-04:CTL STPT', 'SDH.PXCM-11', self.setpt)    
+                self.bacnet_c.write('SDH.S4-04:CTL FLOW MIN', 'SDH.PXCM-11', self.vent)
+                
                 self.bacnet_c.write('SDH.S4-13:HEAT.COOL', 'SDH.PXCM-11', self.heat)
                 self.bacnet_c.write('SDH.S4-13:CTL STPT', 'SDH.PXCM-11', self.setpt)    
                 self.bacnet_c.write('SDH.S4-13:CTL FLOW MIN', 'SDH.PXCM-11', self.vent)
                 
+                self.bacnet_c.write('SDH.S4-12:HEAT.COOL', 'SDH.PXCM-11', self.heat)
+                self.bacnet_c.write('SDH.S4-12:CTL STPT', 'SDH.PXCM-11', self.setpt)    
+                self.bacnet_c.write('SDH.S4-12:CTL FLOW MIN', 'SDH.PXCM-11', self.vent)
+                
+                self.bacnet_c.write('SDH.S4-18:HEAT.COOL', 'SDH.PXCM-11', self.heat)
+                self.bacnet_c.write('SDH.S4-18:CTL STPT', 'SDH.PXCM-11', self.setpt)    
+                self.bacnet_c.write('SDH.S4-18:CTL FLOW MIN', 'SDH.PXCM-11', self.vent)
+                
+                self.bacnet_c.write('SDH.S4-21:HEAT.COOL', 'SDH.PXCM-11', self.heat)
+                self.bacnet_c.write('SDH.S4-21:CTL STPT', 'SDH.PXCM-11', self.setpt)    
+                self.bacnet_c.write('SDH.S4-21:CTL FLOW MIN', 'SDH.PXCM-11', self.vent)
         
         except Exception, e:
             self.error = True
