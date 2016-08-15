@@ -108,7 +108,7 @@ def update(d, model, client, state, area, Mean_Running_Average, debug):
         print 'WARNING : PROBLEM DETECTED 1'
         print e
         warning = 3
-        [T, co2, set_point, T_outdoor,   Cal_data,  H_C_power,  hour] = [23,400,23,23,2,-12,12]
+        [T, co2, set_point, T_outdoor,   Cal_data,  H_C_power,  hour] = [23,401,23,23,2,-12,12]
         
     #occupancy prdiction
     try:
