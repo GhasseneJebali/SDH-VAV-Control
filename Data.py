@@ -22,7 +22,7 @@ Hum_uuid4 = 'e57a5324-0129-569d-94b4-ec6659f15186' #capteur 1625 VAV zone 12
 
 # Co2 data uuid's
 co2_uuid5 = '04b072d6-6b18-5a4f-8469-c6e203646391' #capteur 2106 / VAV zone 9
-co2_uuid6 = '17337697-a7aa-5277-a3ae-5dc936a4bd01'#capteur 2029 / VAV zone 18
+co2_uuid6 = '17337697-a7aa-5277-a3ae-5dc936a4bd01' #capteur 2029 / VAV zone 18
 #'85aac043-ded6-564e-ab87-373b302fe4d0''cc190116-9ccc-53de-bd30-762af630d380'
 
 # Outdoor temperature uuid
@@ -358,8 +358,8 @@ def Real_Time_Data(client):
     co2_data2 = client.latest("uuid = '"+ co2_uuid6+"'")[0]['Readings'][0][1]
     co2_data3 = client.latest("uuid = '"+ co2_uuid7+"'")[0]['Readings'][0][1]
     
-    co2=(co2_data1 + co2_data2 + co2_data3 )/3
-
+    #co2=(co2_data1 + co2_data2 + co2_data3 )/3
+    co2= co2_data1
     
     # Set ponit 
     S=0
