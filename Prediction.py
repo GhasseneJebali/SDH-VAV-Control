@@ -216,7 +216,8 @@ def occupancy(state, cal, h, co2):
             number=15
             return state, Human_power, number
     if state=='slightly occupied':
-        if (cal==2 and h<17 and h>=10 and co2>500) or co2>500:
+        #if (cal==2 and h<17 and h>=10 and co2>500) or co2>500:
+        if cal==2 and h<17 and h>=10:
             state='occupied'
             Human_power=3.0
             number=30
@@ -232,7 +233,8 @@ def occupancy(state, cal, h, co2):
             number=15
             return state, Human_power, number
     if state=='occupied':
-        if cal==2 and h<17 and h>=10 and co2>400:
+        #if cal==2 and h<17 and h>=10 and co2>400:
+        if cal==2 and h<17 and h>=10:
             state='occupied'
             Human_power=3.0
             number=30
