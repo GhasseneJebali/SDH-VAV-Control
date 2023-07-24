@@ -4,204 +4,183 @@ Created on Tue May 17 10:34:46 2016
 
 @author: Ghassene Jebali jbali.ghassen@gmail.com
 """
+import time
+import datetime
+import requests
+
+
 # returns the mean temperature of a given date
-def max_T_history(date):
-    import requests
-    
+def max_t_history(date):
+    """ max temperature in history"""
     urlstart = 'http://api.wunderground.com/api/0d2ebd8eea932783/history_'
     urlend = '/q/CA/berkeley.json'
     url = urlstart + date + urlend
     data = requests.get(url).json()
 
     return data['history']['dailysummary'][0]['maxtempm']
-    
-    
+
+
 # returns the date of a previous delta day
 def previous_date(delta):
-    
-    import time
-    import datetime
-    
+    """returns previous date"""
     if int(time.strftime("%j")) > int(delta):
         day = int(time.strftime("%j"))-int(delta)
         year = time.strftime("%Y")
     else:
         day = 366 + int(time.strftime("%j"))-int(delta)
-        year = int(time.strftime("%Y"))-1
-        
+        year = int(time.strftime("%Y")) - 1
+
     now = str(year)+' '+str(day)
     date = str(datetime.datetime.strptime(now, '%Y %j'))
-    y = str(date[0:4])
-    m = str(date[5:7])
-    d = str(date[8:10])
-    return y+m+d
- 
-# returns the minimum and maximum temperature for a given running average. 90% acceptability
-def ACZ(previous_Mean_Running_Average):    
-    import time
-    import datetime
-    
-    alpha = 0.7 # Higher alpha means slower adaptation
-    T_history={}
-    
+    year = str(date[0:4])
+    month = str(date[5:7])
+    day = str(date[8:10])
+    return year + month + day
+
+
+def acz(previous_mean_running_average):
+    """returns the minimum and maximum temperature for a given running average. 90% acceptability"""
+    alpha = 0.7  # Higher alpha means slower adaptation
+    t_history={}
+
     date = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')    
     hour = int(date[11:13])
     if hour == 0:
         for i in range(1,8):
-            T_history[str(i)] = max_T_history(previous_date(i)) 
-        Mean_Running_Average =  (1.0 - alpha) * sum( (alpha** (i-1) ) * int(T_history [str(i)]) for i in range(1,8) )
+            t_history[str(i)] = max_t_history(previous_date(i)) 
+        mean_running_average =  (1.0 - alpha) * sum(
+            (alpha** (i-1) ) * int(t_history [str(i)]) for i in range(1,8)
+            )
     else:
-        Mean_Running_Average = previous_Mean_Running_Average
-    
-    Upper_limit = 0.31 * Mean_Running_Average + 21.3
-    Lower_limit = 0.31 * Mean_Running_Average + 14.3 - 1 #Larger confort zone to avoid unnecessary cooling 
-    
-    return Lower_limit, Upper_limit, Mean_Running_Average
+        mean_running_average = previous_mean_running_average
+
+    upper_limit = 0.31 * mean_running_average + 21.3
+    # Larger confort zone to avoid unnecessary cooling
+    lower_limit = 0.31 * mean_running_average + 14.3 - 1
+
+    return lower_limit, upper_limit, mean_running_average
     
 
-def control(state, N_person, area, T_outdoor, co2, T_predicted, Mean_Running_Average ):
-    import time
-    import requests
-       
-    forecast = requests.get("http://api.wunderground.com/api/0d2ebd8eea932783/forecast/q/CA/berkeley.json").json()
+def control(state, n_person, area, t_outdoor, co2, t_predicted, mean_running_average ):
+    """ control instructions"""
+    forecast = requests.get(
+        "http://api.wunderground.com/api/0d2ebd8eea932783/forecast/q/CA/berkeley.json"
+        ).json()
     next_day = forecast['forecast']['simpleforecast']['forecastday'][0]
-    
-    T_forecast_max = next_day['high']['celsius'] 
+
+    t_forecast_max = next_day['high']['celsius']
 
     # temperature setpoints
-    Lower_T_limit, Upper_T_limit, Mean_Running_Average  = ACZ(Mean_Running_Average)
-    
-    Hight_setpt = (Lower_T_limit + 3*Upper_T_limit)/4
-    Center_setpt = (Lower_T_limit + Upper_T_limit)/2
-    Low_setpt = (3*Lower_T_limit + Upper_T_limit)/4
-    Hight_setpt=round(Hight_setpt,1)
-    Center_setpt=round(Center_setpt,1)
-    Low_setpt=round(Low_setpt,1)
-    
+    lower_t_limit, upper_t_limit, mean_running_average  = acz(mean_running_average)
+
+    hight_setpt = (lower_t_limit + 3*upper_t_limit) / 4
+    center_setpt = (lower_t_limit + upper_t_limit) / 2
+    low_setpt = (3*lower_t_limit + upper_t_limit) / 4
+    hight_setpt=round(hight_setpt,1)
+    center_setpt=round(center_setpt, 1)
+    low_setpt=round(low_setpt,1)
+
     # ventillation setpoint
-    CA = 0.06 # cfm/ft2
-    CP = 5 # cfm/person
-    Zone_Air_Distribution_Effectiveness = 1.0
-    Vent_min = (CA*area + CP*N_person) / Zone_Air_Distribution_Effectiveness
-    Vent_setpt = 5*Vent_min #greater ventillation minimum to avoid overheating of the zone.
+    ca_ = 0.06 # cfm/ft2
+    cp_ = 5 # cfm/person
+    zone_air_distribution_effectiveness = 1.0
+    vent_min = (ca_ * area + cp_ * n_person) / zone_air_distribution_effectiveness
+    vent_setpt = 5*vent_min #greater ventillation minimum to avoid overheating of the zone.
 
     # morning afternnon determination
-    hour = time.strftime("%H")
+    hour = time.strftime("%h")
     if hour < 12:
-        AM_PM = 'AM'
+        am_pm = 'am'
     else:
-        AM_PM = 'PM'        
-         
+        am_pm = 'pm'
 
     if state == 'not occupied':
-        if Mean_Running_Average > 15 :
-           
-            vent = Vent_setpt
+        if mean_running_average > 15:
+            vent = vent_setpt
             heat = 0
-            setpt = Upper_T_limit
-            return   vent, heat, setpt, Mean_Running_Average
+            setpt = upper_t_limit
+            return   vent, heat, setpt, mean_running_average
         else:
-           
-            vent = Vent_setpt
+            vent = vent_setpt
             heat = 1
-            setpt = Lower_T_limit
-            return    vent, heat, setpt, Mean_Running_Average
-                   
+            setpt = lower_t_limit
+            return    vent, heat, setpt, mean_running_average
     if state == 'occupied':
         if co2 > 800:
-      
-            vent = Vent_setpt*1.5
+            vent = vent_setpt*1.5
             heat = 0
-            setpt = Center_setpt
-            return   vent, heat, setpt, Mean_Running_Average
+            setpt = center_setpt
+            return   vent, heat, setpt, mean_running_average
         if co2 <= 800:
-            if T_predicted > Upper_T_limit:
-              
-                vent = Vent_setpt*1.5
+            if t_predicted > upper_t_limit:
+                vent = vent_setpt*1.5
                 heat = 0
-                setpt = Center_setpt
-                return  vent, heat, setpt, Mean_Running_Average
-            if T_predicted < Lower_T_limit:
-              
-                vent = Vent_setpt
+                setpt = center_setpt
+                return  vent, heat, setpt, mean_running_average
+            if t_predicted < lower_t_limit:
+                vent = vent_setpt
                 heat = 1
-                setpt = Low_setpt
-                return  vent, heat, setpt, Mean_Running_Average
+                setpt = low_setpt
+                return  vent, heat, setpt, mean_running_average
             else:
-                if Mean_Running_Average <= 15:
-                    if AM_PM == 'AM':
-                      
-                        vent = Vent_setpt
+                if mean_running_average <= 15:
+                    if am_pm == 'am':
+                        vent = vent_setpt
                         heat = 1
-                        setpt = Low_setpt
-                        return   vent, heat, setpt, Mean_Running_Average
-                    if AM_PM == 'PM':
-                      
-                        vent = Vent_setpt
+                        setpt = low_setpt
+                        return   vent, heat, setpt, mean_running_average
+                    if am_pm == 'pm':
+                        vent = vent_setpt
                         heat = 1
-                        setpt = Center_setpt
-                        return   vent, heat, setpt, Mean_Running_Average
-                if Mean_Running_Average > 15:
-                    if AM_PM == 'AM':
-                       
-                        vent = Vent_setpt
+                        setpt = center_setpt
+                        return   vent, heat, setpt, mean_running_average
+                if mean_running_average > 15:
+                    if am_pm == 'am':
+                        vent = vent_setpt
                         heat = 0
-                        setpt = Low_setpt
-                        return   vent, heat, setpt, Mean_Running_Average
-                    if AM_PM == 'PM':
-                      
-                        vent = Vent_setpt
+                        setpt = low_setpt
+                        return   vent, heat, setpt, mean_running_average
+                    if am_pm == 'pm':
+                        vent = vent_setpt
                         heat = 0
-                        setpt = Center_setpt
-                        return   vent, heat, setpt , Mean_Running_Average    
-
+                        setpt = center_setpt
+                        return   vent, heat, setpt , mean_running_average    
     if state == 'slightly occupied':
-        if ( (AM_PM == 'PM') or ( (AM_PM == 'AM') and (T_forecast_max < 28) ) ):
-            
-            if Mean_Running_Average > 15:
-                if T_predicted > Upper_T_limit:
-          
-                    vent = Vent_setpt*1.5
+        if ( (am_pm == 'pm') or ( (am_pm == 'am') and (t_forecast_max < 28) ) ):
+            if mean_running_average > 15:
+                if t_predicted > upper_t_limit:
+                    vent = vent_setpt*1.5
                     heat = 0
-                    setpt = Center_setpt
-                    return  vent, heat, setpt, Mean_Running_Average
-                if T_predicted < Lower_T_limit:
-                
-                    vent = Vent_setpt
+                    setpt = center_setpt
+                    return  vent, heat, setpt, mean_running_average
+                if t_predicted < lower_t_limit:
+                    vent = vent_setpt
                     heat = 0
-                    setpt = Low_setpt
-                    return  vent, heat, setpt, Mean_Running_Average
+                    setpt = low_setpt
+                    return  vent, heat, setpt, mean_running_average
                 else:
-                 
-                    vent = Vent_setpt
+                    vent = vent_setpt
                     heat = 0
-                    setpt = Center_setpt
-                    return  vent, heat, setpt, Mean_Running_Average
-            if Mean_Running_Average <= 15:
-                if T_predicted > Upper_T_limit:
-               
-                    vent = Vent_setpt
+                    setpt = center_setpt
+                    return  vent, heat, setpt, mean_running_average
+            if mean_running_average <= 15:
+                if t_predicted > upper_t_limit:
+                    vent = vent_setpt
                     heat = 0
-                    setpt = Center_setpt
-                    return  vent, heat, setpt, Mean_Running_Average
-                if T_predicted < Lower_T_limit:
-
-                    vent = Vent_setpt
+                    setpt = center_setpt
+                    return  vent, heat, setpt, mean_running_average
+                if t_predicted < lower_t_limit:
+                    vent = vent_setpt
                     heat = 1
-                    setpt = Low_setpt
-                    return   vent, heat, setpt, Mean_Running_Average
+                    setpt = low_setpt
+                    return   vent, heat, setpt, mean_running_average
                 else:
-
-                    vent = Vent_setpt
+                    vent = vent_setpt
                     heat = 1
-                    setpt = Center_setpt
-                    return  vent, heat, setpt, Mean_Running_Average
+                    setpt = center_setpt
+                    return  vent, heat, setpt, mean_running_average
         else:
-            vent = Vent_setpt*1.5
+            vent = vent_setpt*1.5
             heat = 0
-            setpt = Center_setpt
-            return   vent, heat, setpt, Mean_Running_Average
-
-  
-  
-  
+            setpt = center_setpt
+            return   vent, heat, setpt, mean_running_average

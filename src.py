@@ -104,18 +104,14 @@ def update(d, model, client, state, area, Mean_Running_Average, debug):
     # Real time data
     try:    
         [T, co2, set_point, hum, T_outdoor, Human_date, Season, Cal_data, vent_power, H_C_power, cool_power, hour]=Data.Real_Time_Data(client)
-    except Exception, e:
-        print 'WARNING : PROBLEM DETECTED 1'
-        print e
+    except Exception:
         warning = 3
         [T, co2, set_point, T_outdoor,   Cal_data,  H_C_power,  hour] = [23,401,23,23,2,-12,12]
         
     #occupancy prdiction
     try:
         state, Human_power, number = Prediction.occupancy(state, Cal_data, hour, co2)  
-    except Exception, e:
-        print 'WARNING : PROBLEM DETECTED 2'
-        print e
+    except Exception:
         warning = 2
         state='occupied'
         Human_power=3.0
@@ -125,17 +121,12 @@ def update(d, model, client, state, area, Mean_Running_Average, debug):
     T_needed_data=[T , H_C_power,  set_point, T_outdoor, Cal_data, Human_power]
     try: 
         T_predicted, warning= Prediction.T_prediciton(d, T_needed_data , model)
-    except Exception, e:
-        print 'WARNING : PROBLEM DETECTED 3'
-        print e
+    except Exception:
         warning = 2
         T_predicted= T
     try:
           vent, heat, setpt, Mean_Running_Average = Control.control(state, number/6, area, T_outdoor, co2, T_predicted, Mean_Running_Average )
-    except Exception, e:
-        print Exception
-        print 'WARNING : PROBLEM DETECTED 4'
-        print e
+    except Exception:
         warning = 4
         heat = 0               
         setpt = 23
@@ -148,9 +139,5 @@ def update(d, model, client, state, area, Mean_Running_Average, debug):
     
         
     
-    print heat
-    print setpt
-    print vent
-    print '---------------------------------------'
         
     return Mean_Running_Average, state, vent, heat, setpt, warning
