@@ -5,16 +5,16 @@ Created on Wed May 04 16:06:20 2016
 @author: Ghassene Jebali jbali.ghassen@gmail.com
 """
 
+import time
+import datetime
+import warnings
 import openpyxl
-import xlsxwriter
-import os
+import prediction
+import control
+import data
 
-###############################################################################
 def write_output(vent, heat, setpt, date, debug):
-    ###############################################################################
-    import openpyxl
-
-    wb = openpyxl.load_workbook("Control.xlsx")
+    wb = openpyxl.load_workbook("control.xlsx")
     sheet = wb.get_sheet_by_name("Sheet1")
     r = sheet.max_row
 
@@ -33,24 +33,17 @@ def write_output(vent, heat, setpt, date, debug):
     sheet.cell(row=1, column=5).value = "Debug"
     sheet.cell(row=r + 1, column=5).value = debug
     try:
-        wb.save("Control.xlsx")
+        wb.save("control.xlsx")
     except Exception:
         pass
 
 
-###############################################################################
 def setup():
-    ###############################################################################
-    # import Data
-    import Prediction
-    import warnings
-    import Control
-
     warnings.filterwarnings("ignore")
 
-    Prediction_horizon = 60  # in minutes
+    prediction_horizon = 60  # in minutes
 
-    # Data.data_acquisition()
+    # data.data_acquisition()
     DATA_LIST = {}
     wb = openpyxl.load_workbook("DATA_LIST.xlsx")
     sheet = wb.get_sheet_by_name("Sheet1")
@@ -62,12 +55,11 @@ def setup():
             )
 
     # Model generation
+    # SVR_model = prediction.Support_Vector_Regression(DATA_LIST, prediction_horizon)
+    KNN_model = prediction.kNN_Regression(DATA_LIST, prediction_horizon)
+    BRR_model = prediction.Bayesian_Ridge_Regression(DATA_LIST, prediction_horizon)
 
-    # SVR_model = Prediction.Support_Vector_Regression(DATA_LIST, Prediction_horizon)
-    KNN_model = Prediction.kNN_Regression(DATA_LIST, Prediction_horizon)
-    BRR_model = Prediction.Bayesian_Ridge_Regression(DATA_LIST, Prediction_horizon)
-
-    #    workbook = xlsxwriter.Workbook(os.path.dirname(os.path.abspath(__file__))+'\Control.xlsx')
+    #    workbook = xlsxwriter.Workbook(os.path.dirname(os.path.abspath(__file__))+'\control.xlsx')
     #    workbook.add_worksheet()
     #    workbook.close()
 
@@ -75,25 +67,17 @@ def setup():
     T_history = {}
     try:
         for i in range(1, 8):
-            T_history[str(i)] = Control.max_T_history(Control.previous_date(i))
-        Mean_Running_Average = (1.0 - alpha) * sum(
+            T_history[str(i)] = control.max_t_history(control.previous_date(i))
+        mean_running_average = (1.0 - alpha) * sum(
             (alpha ** (i - 1)) * int(T_history[str(i)]) for i in range(1, 8)
         )
     except Exception:
-        Mean_Running_Average = 20
+        mean_running_average = 20
 
-    return DATA_LIST, KNN_model, BRR_model, Mean_Running_Average
+    return DATA_LIST, KNN_model, BRR_model, mean_running_average
 
 
-###############################################################################
-def update(d, model, client, state, area, Mean_Running_Average, debug):
-    ###############################################################################
-    import Data
-    import Prediction
-    import Control
-    import warnings
-    import time, datetime
-
+def update(d, model, client, state, area, mean_running_average):
     warnings.filterwarnings("ignore")
 
     date = datetime.datetime.fromtimestamp(time.time()).strftime("%Y-%m-%d %H:%M:%S")
@@ -102,22 +86,22 @@ def update(d, model, client, state, area, Mean_Running_Average, debug):
     # Real time data
     try:
         [
-            T,
+            t,
             co2,
             set_point,
             hum,
-            T_outdoor,
-            Human_date,
-            Season,
-            Cal_data,
+            t_outdoor,
+            human_date,
+            season,
+            cal_data,
             vent_power,
-            H_C_power,
+            h_c_power,
             cool_power,
             hour,
-        ] = Data.Real_Time_Data(client)
+        ] = data.real_time_data(client)
     except Exception:
         warning = 3
-        [T, co2, set_point, T_outdoor, Cal_data, H_C_power, hour] = [
+        [t, co2, set_point, t_outdoor, cal_data, h_c_power, hour] = [
             23,
             401,
             23,
@@ -129,23 +113,23 @@ def update(d, model, client, state, area, Mean_Running_Average, debug):
 
     # occupancy prdiction
     try:
-        state, Human_power, number = Prediction.occupancy(state, Cal_data, hour, co2)
+        state, human_power, number = prediction.occupancy(state, cal_data, hour, co2)
     except Exception:
         warning = 2
         state = "occupied"
-        Human_power = 3.0
+        human_power = 3.0
         number = 30
 
     # Temperature prediction
-    T_needed_data = [T, H_C_power, set_point, T_outdoor, Cal_data, Human_power]
+    t_needed_data = [t, h_c_power, set_point, t_outdoor, cal_data, human_power]
     try:
-        T_predicted, warning = Prediction.T_prediciton(d, T_needed_data, model)
+        t_predicted, warning = prediction.t_prediciton(d, t_needed_data, model)
     except Exception:
         warning = 2
-        T_predicted = T
+        t_predicted = t
     try:
-        vent, heat, setpt, Mean_Running_Average = Control.control(
-            state, number / 6, area, T_outdoor, co2, T_predicted, Mean_Running_Average
+        vent, heat, setpt, mean_running_average = control.control(
+            state, number / 6, area, t_outdoor, co2, t_predicted, mean_running_average
         )
     except Exception:
         warning = 4
@@ -155,6 +139,4 @@ def update(d, model, client, state, area, Mean_Running_Average, debug):
 
     setpt = round((setpt * 9 / 5) + 32, 1)
 
-    # write_output( vent, heat, setpt, date, debug)
-
-    return Mean_Running_Average, state, vent, heat, setpt, warning
+    return mean_running_average, state, vent, heat, setpt, warning
